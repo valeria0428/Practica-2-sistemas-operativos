@@ -83,6 +83,24 @@ class GUIMain:
                         "msg": f"launch:{_}"
                     })
                     option = 0
+                elif option == 2:
+                    self.__pipe.send({
+                        "cmd": "info",
+                        "src": "GUI",
+                        "dst": "applications",
+                        "msg": f"list"
+                    })
+                    self.wait()
+                    information = self.__pipe.recv()
+                    interface.decide_option(option, 1, information)
+                elif option == 3:
+                    _, option = interface.decide_option(option, 1)
+                    self.__pipe.send({
+                        "cmd": "info",
+                        "src": "GUI",
+                        "dst": "applications",
+                        "msg": f"stop:{_}"
+                    })
                 else:
                     interface.decide_option(option, 1)
 

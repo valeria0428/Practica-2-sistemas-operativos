@@ -2,27 +2,28 @@ import random
 import time
 
 from multiprocessing.dummy.connection import Connection
+from system import System
 
 
-def random_app(pipe: Connection):
-    status = True
-    while status:
-        rand = random.randint(0, 1000) % 10
-        pipe.send({
-            "cmd": "send",
-            "src": "application/random1",
-            "dst": "GestorArc",
-            "msg": f"log:Numero generado {rand}"
-        })
-
-        if rand > 30 and rand < 40:
-            status = False
+class Main(System):
+    def random_app(self, pipe: Connection):
+        while self.running:
+            rand = random.randint(0, 1000) % 10
             pipe.send({
-                "codterm": 2,
-                "msg": "Bad description"
+                "cmd": "send",
+                "src": "application/random1",
+                "dst": "GestorArc",
+                "msg": f"log:Numero generado {rand}"
             })
 
-        if rand > 10 and rand < 20:
-            raise Exception("Divide by 0")
+            if rand > 30 and rand < 40:
+                self.running = False
+                pipe.send({
+                    "codterm": 2,
+                    "msg": "Bad description"
+                })
 
-        time.sleep(5)
+            if rand > 10 and rand < 20:
+                raise Exception("Divide by 0")
+
+            time.sleep(5)

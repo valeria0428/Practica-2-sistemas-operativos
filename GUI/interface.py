@@ -22,7 +22,11 @@ class Interface:
             print(log)
 
     def print_application(self, applications):
-        pass
+        print("_________Applications_________")
+        print("PID - Name")
+
+        for application in applications:
+            print(application)
 
     def create_folder(self):
         return input("Insert folder name: ")
