@@ -4,6 +4,7 @@ import logging
 import threading
 
 from multiprocessing.dummy.connection import Connection
+from apps.generate_ramdom_numbers import random_app
 
 
 class ApplicationsMain:
@@ -57,7 +58,13 @@ class ApplicationsMain:
                 self.__apps.remove(_app)
 
     def launch_app(self, app_name):
-        pass
+        if app_name == "random":
+            thread = threading.Thread(name="application/random", target=random_app, args=[self.__pipe])
+            thread.start()
+            self.__apps.append({
+                "pid": thread.native_id,
+                "thread": thread
+            })
 
 
 

@@ -74,7 +74,17 @@ class GUIMain:
                     interface.decide_option(option, 0)
             else:
                 option = interface.input()
-                interface.decide_option(option, 1)
+                if option == 1:
+                    _, option = interface.decide_option(option, 1)
+                    self.__pipe.send({
+                        "cmd": "info",
+                        "src": "GUI",
+                        "dst": "applications",
+                        "msg": f"launch:{_}"
+                    })
+                    option = 0
+                else:
+                    interface.decide_option(option, 1)
 
             print()
             time.sleep(2)

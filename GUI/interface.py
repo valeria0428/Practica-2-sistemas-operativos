@@ -12,7 +12,7 @@ class Interface:
     def controller_applications(self):
         print("_________Controller applications_________")
         print("1. Open new application")
-        print("2. List all applications")
+        print("2. List running applications")
         print("3. Close application")
 
     def system_logs(self, logs):
