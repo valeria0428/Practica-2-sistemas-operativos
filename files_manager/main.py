@@ -2,6 +2,7 @@ import os
 import logging
 import time
 import json
+from multiprocessing.dummy.connection import Connection
 
 
 class FileSystemMain:
@@ -10,7 +11,7 @@ class FileSystemMain:
     __dirs = None
     __total = 0
 
-    def __init__(self, pipe):
+    def __init__(self, pipe: Connection):
         self.__pipe = pipe
 
     def start(self):
@@ -49,10 +50,18 @@ class FileSystemMain:
                 logging.info(message[1])
 
             if message[0].lower() == 'read':
-                pass
+                with open('./storage/logs', "r") as logs:
+                    lines = logs.readlines()
+                    last_lines = lines[-10:]
+                    self.__pipe.send({
+                        "cmd": "info",
+                        "src": "GestorArc",
+                        "dst": "GUI",
+                        "msg": last_lines
+                    })
 
             if message[0].lower() == 'folder':
-                self.manage_folders(message[1], message[2])
+                self.manage_folders(int(message[1]), message[2])
 
     def manage_folders(self, operation, name):
         if operation == 0:

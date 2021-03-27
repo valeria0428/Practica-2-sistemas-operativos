@@ -83,6 +83,20 @@ class KernelMain:
         elif message['dst'] == "kernel":
             if action == "stop":
                 self.halt(message['src'])
+
+            if not action:
+                if message['msg'] == 'sysinfo':
+                    self.__GUI_CONN.send({
+                        "cmd": 'info',
+                        "src": "kernel",
+                        "dst": 'GUI',
+                        "msg": {
+                            "GUI": self.__GUI_thread.is_alive(),
+                            "files_manager": self.__FILE_SYSTEM_thread.is_alive(),
+                            "applications": self.__APPLICATION_thread.is_alive(),
+                            "kernel": self._kernel_status
+                        }
+                    })
         else:
             logging.error("Destination not founded")
 

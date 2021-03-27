@@ -16,7 +16,10 @@ class Interface:
         print("3. Close application")
 
     def system_logs(self, logs):
-        print(logs)
+        print("_________Last 10 logs_________")
+
+        for log in logs:
+            print(log)
 
     def print_application(self, applications):
         pass
@@ -25,10 +28,10 @@ class Interface:
         return input("Insert folder name: ")
 
     def system_information(self, information):
-        print(f"Kernel: {information[0]}")
-        print(f"GUI: {information[1]}")
-        print(f"Applicaciones: {information[2]}")
-        print(f"Files_manager: {information[3]}")
+        print(f"Kernel: {information['kernel']}")
+        print(f"GUI: {information['GUI']}")
+        print(f"Applicaciones: {information['applications']}")
+        print(f"Files_manager: {information['files_manager']}")
 
     def input(self):
         return int(input(".:: Eliga una opción: "))
@@ -44,14 +47,14 @@ class Interface:
             elif option == 3:
                 return self.create_folder(), 3
             elif option == 4:
-                self.system_information()
+                self.system_information(information)
                 return None, 4
         elif menu == 1:
             if option == 1:
-                return input(".:: Insert application name")
+                return input(".:: Insert application name: "), 1
             elif option == 2:
-                self.print_application(information)
+                self.print_application(information), 2
             elif option == 3:
-                return input(".:: Insert application PID")
+                return input(".:: Insert application PID: "), 3
         else:
             logging.error("The selected menu dosen't exists")
