@@ -42,6 +42,7 @@ class System:
         self.__kernel_thread.join()
         logging.info("Program finished. Exit code 0")
 
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(threadName)s:.:%(levelname)s] x %(message)s',
                         datefmt="%Y/%m/%d %I:%M:%S %p")

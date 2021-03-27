@@ -1,13 +1,15 @@
 import logging
-import time
 import threading
+import time
+import json
 
 from multiprocessing import Pipe
-
+from multiprocessing.dummy.connection import Connection
 # System parts
+
+from GUI.main import GUIMain
 from applications.main import ApplicationsMain
 from files_manager.main import FileSystemMain
-from GUI.main import GUIMain
 
 
 class KernelMain:
@@ -18,6 +20,8 @@ class KernelMain:
     __GUI_thread = None
     __FILE_SYSTEM_thread = None
     __APPLICATION_thread = None
+
+    _kernel_status = True
 
     def start_system(self):
         # Communication Pipes
@@ -44,11 +48,70 @@ class KernelMain:
         logging.info("Kernel ready starting system...")
         self.internal()
 
-    def listen_pies(self):
-        gui_message = self.__GUI_CONN.poll(3)
-        application_message = self.__APPLICATION_CONN.poll(3)
-        file_system_message = self.__FILE_SYSTEM_CONN.poll(3)
+    def listen_pipes(self, conn: Connection):
+        while True:
+            if not conn.poll(3):
+                time.sleep(0.2)
+                continue
+
+            message = conn.recv()
+            
+            if 'cmd' in message:
+                # Tunel messages
+                if message['cmd'] == "send":
+                    self.find_destination(message)
+                elif message['cmd'] == "info":
+                    self.find_destination(message)
+                elif message['cmd'] == "stop":
+                    self.find_destination(message, action="stop")
+
+            elif 'codterm' in message:
+                if message['codterm'] == 0:
+                    logging.info("Successes operation")
+                elif message['codterm'] == 1:
+                    logging.warning("Module busy")
+                elif message['codterm'] == 2:
+                    logging.error(message['msg'])
+
+    def find_destination(self, message, action=None):
+        if message['dst'] == "GestorArc":
+            self.__FILE_SYSTEM_CONN.send(message['msg'])
+        elif message['dst'] == "GUI":
+            self.__GUI_CONN.send(message['msg'])
+        elif message['dst'] == "applications":
+            self.__APPLICATION_CONN.send(message['msg'])
+        elif message['dst'] == "kernel":
+            if action == "stop":
+                self.halt(message['src'])
+        else:
+            logging.error("Destination not founded")
+
+    def halt(self, instance):
+        if instance == "GUI":
+            self.__GUI_thread._stop()
+            self.__GUI_thread.join()
+        elif instance == "applications":
+            self.__APPLICATION_thread._stop()
+            self.__APPLICATION_thread.join()
+        elif instance == "GestorArc":
+            self.__FILE_SYSTEM_thread._stop()
+            self.__FILE_SYSTEM_thread.join()
 
     def internal(self):
-        while True:
+        gui_message = threading.Thread(name="kernel/messages/GUI", target=self.listen_pipes, args=[self.__GUI_CONN])
+        files_message = threading.Thread(name="kernel/messages/files", target=self.listen_pipes,
+                                         args=[self.__FILE_SYSTEM_CONN])
+        application_message = threading.Thread(name="kernel/messages/application", target=self.listen_pipes,
+                                               args=[self.__APPLICATION_CONN])
+
+        gui_message.start()
+        files_message.start()
+        application_message.start()
+
+        while self._kernel_status:
+
             time.sleep(0.2)
+
+        gui_message._stop()
+        files_message._stop()
+        application_message._stop()
