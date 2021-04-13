@@ -2,45 +2,46 @@ import logging
 
 
 class Interface:
-    def main(self):
+    def main(self): # Interfaz del menu principal
         print("_________Main_________")
         print("1. Controller applications")
         print("2. See system logs")
         print("3. Create new folder")
         print("4. See system information")
 
-    def controller_applications(self):
+    def controller_applications(self):  # Interfaz de controlador de aplicaciones
         print("_________Controller applications_________")
         print("1. Open new application")
         print("2. List running applications")
         print("3. Close application")
 
-    def system_logs(self, logs):
+    def system_logs(self, logs):  # Imprime los logs
         print("_________Last 10 logs_________")
 
-        for log in logs:
+        for log in logs:  # Itera sobre el arreglo del logs
             print(log)
 
-    def print_application(self, applications):
+    def print_application(self, applications):  # Imprime las aplicaciones
         print("_________Applications_________")
         print("PID - Name")
 
-        for application in applications:
+        for application in applications:  # Se itera sobre el arreglo de aplicaciones
             print(application)
 
     def create_folder(self):
-        return input("Insert folder name: ")
+        return input("Insert folder name: ")  # Se solicita el nombre del folder
 
-    def system_information(self, information):
+    def system_information(self, information):  # Se imprime el estado del sistema
         print(f"Kernel: {information['kernel']}")
         print(f"GUI: {information['GUI']}")
         print(f"Applicaciones: {information['applications']}")
         print(f"Files_manager: {information['files_manager']}")
 
     def input(self):
-        return int(input(".:: Eliga una opción: "))
+        return int(input(".:: Eliga una opción: "))  # Se solicita una opción al usuario
 
     def decide_option(self, option, menu, information=None):
+        # Se llama los métodos según la decisión del usuario
         if menu == 0:
             if option == 1:
                 self.controller_applications()
